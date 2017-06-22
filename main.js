@@ -9,6 +9,8 @@ const {
   Tray
 } = require('electron');
 
+const fs = require('fs');
+
 // 二重起動防止
 var shouldQuit = app.makeSingleInstance((argv, workingDirectory) => {})
 if (shouldQuit) app.quit()
@@ -24,10 +26,13 @@ const config = new Config({
 })
 
 const twitterAPI = require('node-twitter-api');
+
+var data = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
 const twitter = new twitterAPI({
-  consumerKey: 'PUT YOUR CONSUMER KEY',
-  consumerSecret: 'PUT YOUR CONSUMER SECRET',
-  callback: 'PUT YOUR URL',
+  consumerKey: data.consumerKey,
+  consumerSecret: data.consumerSecret,
+  callback: data.callback,
 });
 
 var twitter_accessToken;
