@@ -1,0 +1,19 @@
+{
+  "name": "pinkycontinent",
+  "version": "1.0.0",
+  "description": "A pleasant Twitter experience",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "pinkylab",
+  "license": "ISC",
+  "dependencies": {
+    "electron-config": "^1.0.0",
+    "node-twitter-api": "^1.8.0",
+    "playback": "^0.2.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^8.7.0"
+  }
+}
