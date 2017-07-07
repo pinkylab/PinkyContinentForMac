@@ -66,6 +66,10 @@ app.on('ready', function () {
         app.relaunch();
         app.exit(0);
       }
+    },
+    {
+      label: 'DevTools',
+      click: function() { mainWindow.toggleDevTools(); }
     }
   ])
   tray.setToolTip('This is my application.')
@@ -114,19 +118,19 @@ app.on('ready', function () {
 
   // 画面表示ショートカット
   const ret = globalShortcut.register('Control+Shift+Space', () => {
-    console.log('CommandOrControl+X is pressed')
+    console.log('BrowserProcess: ' + 'CommandOrControl+X is pressed')
     showOrHideWindow();
   });
 
   // レンダラからのツイート指示を受け取る
   ipcMain.on('asynchronous-tweet', function (event, tweetstr) {
-    console.log(tweetstr);
+    console.log('BrowserProcess: ' + tweetstr);
     tweet(tweetstr, event); // レンダラに結果を返すために event を引数に入れた
   })
 
   // ウィンドウ隠してね指示を受け取る
   ipcMain.on('hide-after-tweet', function (mainWindow) {
-    console.log('hide-after-tweet');
+    console.log('BrowserProcess: ' + 'hide-after-tweet');
     showOrHideWindow();
   })
 
@@ -184,12 +188,10 @@ function tweet(tweetstr, event) {
     twitter_accessTokenSecret,
     function (error, data, response) {
       if (error) {
-        console.log(error);
-        console.log('tweet() error');
+        console.log('BrowserProcess: ' + error);
         event.sender.send('asynchronous-tweet-ret', 'error');
       } else {
-        // console.log(data);
-        console.log("tweet() success");
+        console.log("BrowserProcess: tweet() success");
         event.sender.send('asynchronous-tweet-ret', 'success');
       }
     });
