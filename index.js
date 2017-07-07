@@ -11,8 +11,8 @@ webFrame.setZoomLevelLimits(1, 1);
 
 // Tweetした後の成否がメインプロセスから返ってくるのでそいつを確認する
 ipcRenderer.on('asynchronous-tweet-ret', function (event, arg) {
-  console.log('RendererProcess: ' + arg);
   if (arg == 'success') {
+    console.log('RendererProcess: ' + 'tweet成功');
     // 成功したらテキストエリア空にする
     document.forms["tweetform"].elements["tweettext"].value = '';
 
