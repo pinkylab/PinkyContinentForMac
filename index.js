@@ -52,5 +52,6 @@ function tweet(str) {
     return;
   }
   // メッセージ送信
+  console.log('RendererProcess: tweetを BrowserProcess に送信');
   ipcRenderer.send('asynchronous-tweet', str);
 }
