@@ -51,13 +51,7 @@ app.on('ready', function () {
   // トレイアイコンの表示
   // TODO 表示非表示項目を足す
   tray = new Tray(__dirname + '/icons/trayicon.png')
-  const contextMenu = Menu.buildFromTemplate([{
-      label: 'Quit',
-      click: function () {
-        app.quit();
-      }
-    },
-    {
+  const taskTrayMenuTemplete = [{
       label: 'Clear Settings',
       click: function () {
         // 設定をデフォルトにして再起動
@@ -69,11 +63,26 @@ app.on('ready', function () {
     },
     {
       label: 'DevTools',
-      click: function() { mainWindow.toggleDevTools(); }
-    }
-  ])
-  tray.setToolTip('This is my application.')
-  tray.setContextMenu(contextMenu)
+      click: function () {
+        mainWindow.toggleDevTools();
+      }
+    },
+    {
+      label: 'Quit',
+      click: function () {
+        app.quit();
+      }
+    },
+  ];
+
+  // ログイン済みの場合スクリーンネームを表示する
+  if (config.has('screen_name')) {
+    taskTrayMenuTemplete.unshift({
+      label: config.get('screen_name'),
+    })
+  }
+
+  tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
 
   const mainWindow = new BrowserWindow({
     frame: false,
@@ -144,9 +153,19 @@ app.on('ready', function () {
           twitter.getAccessToken(requestToken, requestTokenSecret, matched[2], function (error, accessToken, accessTokenSecret, results) {
             twitter_accessToken = accessToken;
             twitter_accessTokenSecret = accessTokenSecret;
+            console.log(results['screen_name']);
             // アクセストークンを保存する
             config.set('twitter_accessToken', twitter_accessToken);
             config.set('twitter_accessTokenSecret', twitter_accessTokenSecret);
+            // スクリーンネームも保存しておく
+            config.set('screen_name', results['screen_name']);
+            // タスクトレイのメニューにスクリーンネームを表示
+            if (config.has('screen_name')) {
+              taskTrayMenuTemplete.unshift({
+                label: config.get('screen_name'),
+              })
+            }
+            tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
             // 投稿画面へ
             twitter.verifyCredentials(
               config.get('twitter_accessToken'),
