@@ -77,9 +77,7 @@ app.on('ready', function () {
 
   // ログイン済みの場合スクリーンネームを表示する
   if (config.has('screen_name')) {
-    taskTrayMenuTemplete.unshift({
-      label: config.get('screen_name'),
-    })
+    addScreenNameToTemplete(taskTrayMenuTemplete);
   }
 
   tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
@@ -161,11 +159,9 @@ app.on('ready', function () {
             config.set('screen_name', results['screen_name']);
             // タスクトレイのメニューにスクリーンネームを表示
             if (config.has('screen_name')) {
-              taskTrayMenuTemplete.unshift({
-                label: config.get('screen_name'),
-              })
+              addScreenNameToTemplete(taskTrayMenuTemplete);
+              tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
             }
-            tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
             // 投稿画面へ
             twitter.verifyCredentials(
               config.get('twitter_accessToken'),
@@ -214,4 +210,10 @@ function tweet(tweetstr, event) {
         event.sender.send('asynchronous-tweet-ret', 'success');
       }
     });
+}
+
+function addScreenNameToTemplete(templete) {
+  templete.unshift({
+      label: "I'm " + config.get('screen_name'),
+    })
 }
