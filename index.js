@@ -16,9 +16,9 @@ ipcRenderer.on('asynchronous-tweet-ret', function (event, arg) {
     // 成功したらテキストエリア空にする
     document.forms["tweetform"].elements["tweettext"].value = '';
 
-    // 投稿後にウィンドウを非表示にする
-    // TODO:ウィンドウを非表示にするか設定できるようにしたい
+    // 投稿後にウィンドウを非表示にする{
     ipcRenderer.send('hide-after-tweet');
+
 
   } else {
     console.log('RendererProcess: tweetミス');

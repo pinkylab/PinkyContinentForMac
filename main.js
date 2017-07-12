@@ -78,6 +78,14 @@ app.on('ready', function () {
       }
     },
     {
+      label: 'Hide After Tweet',
+      type: 'checkbox',
+      checked: config.has('hide_after_tweet') ? config.get('hide_after_tweet') : true,
+      click: function (e) {
+        config.set('hide_after_tweet', e.checked);
+      }
+    },
+    {
       label: 'Quit',
       click: function () {
         app.quit();
@@ -110,6 +118,15 @@ app.on('ready', function () {
     } else {
       mainWindow.show();
     }
+  }
+
+  function addScreenNameToTemplete(templete) {
+    templete.unshift({
+      label: "I'm @" + config.get('screen_name'),
+      click: function () {
+        showOrHideWindow();
+      }
+    })
   }
 
   if (process.platform === 'darwin') {
@@ -147,8 +164,10 @@ app.on('ready', function () {
 
   // ウィンドウ隠してね指示を受け取る
   ipcMain.on('hide-after-tweet', function (mainWindow) {
-    console.log('BrowserProcess: ' + 'hide-after-tweet');
-    showOrHideWindow();
+    if (config.get('hide_after_tweet')) {
+      console.log('BrowserProcess: ' + 'hide-after-tweet');
+      showOrHideWindow();
+    }
   })
 
   // アクセストークンとかなかったら取得する
@@ -225,10 +244,4 @@ function tweet(tweetstr, event) {
         event.sender.send('asynchronous-tweet-ret', 'success');
       }
     });
-}
-
-function addScreenNameToTemplete(templete) {
-  templete.unshift({
-    label: "I'm @" + config.get('screen_name'),
-  })
 }
