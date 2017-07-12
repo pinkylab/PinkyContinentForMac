@@ -52,24 +52,39 @@ app.on('ready', function () {
   // TODO 表示非表示項目を足す
   tray = new Tray(__dirname + '/icons/trayicon.png')
   const taskTrayMenuTemplete = [{
-      label: 'Clear Settings',
-      click: function () {
-        var options = {
-          title: 'Clear Settings?',
-          type: 'warning',
-          buttons: ['OK', 'Cancel'],
-          cancelId: 0,
-          message: 'Clear Settings',
-          detail: 'OK?'
-        };
-        // buttons 配列の一つ目の添字が 0 になる
-        if (dialog.showMessageBox(options) == 0) {
-          // 設定をデフォルトにして再起動
-          config.clear();
-          app.relaunch();
-          app.exit(0);
-        }
-      }
+      label: 'Settings',
+      submenu: [{
+          label: 'Hide After Tweet',
+          type: 'checkbox',
+          checked: config.has('hide_after_tweet') ? config.get('hide_after_tweet') : true,
+          click: function (e) {
+            config.set('hide_after_tweet', e.checked);
+          }
+        },
+        {
+          label: 'Clear Settings',
+          click: function () {
+            var options = {
+              title: 'Clear Settings?',
+              type: 'warning',
+              buttons: ['OK', 'Cancel'],
+              cancelId: 0,
+              message: 'Clear Settings',
+              detail: 'OK?'
+            };
+            // buttons 配列の一つ目の添字が 0 になる
+            if (dialog.showMessageBox(options) == 0) {
+              // 設定をデフォルトにして再起動
+              config.clear();
+              app.relaunch();
+              app.exit(0);
+            }
+          }
+        },
+      ]
+    },
+    {
+      type: 'separator'
     },
     {
       label: 'DevTools',
@@ -78,12 +93,7 @@ app.on('ready', function () {
       }
     },
     {
-      label: 'Hide After Tweet',
-      type: 'checkbox',
-      checked: config.has('hide_after_tweet') ? config.get('hide_after_tweet') : true,
-      click: function (e) {
-        config.set('hide_after_tweet', e.checked);
-      }
+      type: 'separator'
     },
     {
       label: 'Quit',
