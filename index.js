@@ -43,7 +43,6 @@ function keydown() {
       document.forms["tweetform"].elements["tweettext"].value += '♪ ' + track.name + ' - ' + track.artist;
     });
   }
-
 }
 
 function tweet(str) {

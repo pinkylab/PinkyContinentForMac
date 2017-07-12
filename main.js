@@ -54,11 +54,21 @@ app.on('ready', function () {
   const taskTrayMenuTemplete = [{
       label: 'Clear Settings',
       click: function () {
-        // 設定をデフォルトにして再起動
-        // TODO 本当にいいですかダイアログ追加する
-        config.clear();
-        app.relaunch();
-        app.exit(0);
+        var options = {
+          title: 'Clear Settings?',
+          type: 'warning',
+          buttons: ['OK', 'Cancel'],
+          cancelId: 0,
+          message: 'Clear Settings',
+          detail: 'OK?'
+        };
+        // buttons 配列の一つ目の添字が 0 になる
+        if (dialog.showMessageBox(options) == 0) {
+          // 設定をデフォルトにして再起動
+          config.clear();
+          app.relaunch();
+          app.exit(0);
+        }
       }
     },
     {
@@ -151,7 +161,6 @@ app.on('ready', function () {
           twitter.getAccessToken(requestToken, requestTokenSecret, matched[2], function (error, accessToken, accessTokenSecret, results) {
             twitter_accessToken = accessToken;
             twitter_accessTokenSecret = accessTokenSecret;
-            console.log(results['screen_name']);
             // アクセストークンを保存する
             config.set('twitter_accessToken', twitter_accessToken);
             config.set('twitter_accessTokenSecret', twitter_accessTokenSecret);
@@ -169,6 +178,12 @@ app.on('ready', function () {
               function (error, data, respons) {
                 mainWindow.loadURL('file://' + __dirname + '/index.html');
               });
+            mainWindow.setBounds({
+              x: 0,
+              y: 0,
+              width: 160,
+              height: 100
+            }, true);
           });
         }
         event.preventDefault();
@@ -214,6 +229,6 @@ function tweet(tweetstr, event) {
 
 function addScreenNameToTemplete(templete) {
   templete.unshift({
-      label: "I'm " + config.get('screen_name'),
-    })
+    label: "I'm @" + config.get('screen_name'),
+  })
 }
