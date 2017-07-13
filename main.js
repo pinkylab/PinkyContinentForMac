@@ -40,7 +40,7 @@ var twitter_accessTokenSecret;
 
 let tray = null
 
-app.on('ready', function () {
+app.on('ready', () => {
   const {
     width,
     height,
