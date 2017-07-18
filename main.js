@@ -22,9 +22,9 @@ const config = new Config({
       width: 800,
       height: 600,
     },
+    hide_after_tweet: true,
   },
 })
-
 const twitterAPI = require('node-twitter-api');
 
 var data = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -49,16 +49,17 @@ app.on('ready', () => {
   } = config.get('bounds')
 
   // トレイアイコンの表示
-  // TODO 表示非表示項目を足す
   tray = new Tray(__dirname + '/icons/trayicon.png')
   const taskTrayMenuTemplete = [{
       label: 'Settings',
       submenu: [{
           label: 'Hide After Tweet',
           type: 'checkbox',
-          checked: config.has('hide_after_tweet') ? config.get('hide_after_tweet') : true,
-          click: function (e) {
+          checked: config.get('hide_after_tweet'),
+          click: (e) => {
+            console.log('BrowserProcess: ' + 'Hide After Tweetクリック前：'+config.get('hide_after_tweet'));
             config.set('hide_after_tweet', e.checked);
+            console.log('BrowserProcess: ' + 'Hide After Tweetクリック後：'+config.get('hide_after_tweet'));
           }
         },
         {
@@ -75,9 +76,7 @@ app.on('ready', () => {
             // buttons 配列の一つ目の添字が 0 になる
             if (dialog.showMessageBox(options) == 0) {
               // 設定をデフォルトにして再起動
-              config.clear();
-              app.relaunch();
-              app.exit(0);
+              clearSettings();
             }
           }
         },
@@ -120,24 +119,6 @@ app.on('ready', () => {
       webSecurity: false
     }
   });
-
-  // ウインドウの状態によってウインドウを表示する
-  function showOrHideWindow() {
-    if (mainWindow.isFocused()) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
-  }
-
-  function addScreenNameToTemplete(templete) {
-    templete.unshift({
-      label: "I'm @" + config.get('screen_name'),
-      click: function () {
-        showOrHideWindow();
-      }
-    })
-  }
 
   if (process.platform === 'darwin') {
     // dockに表示しない
@@ -231,6 +212,31 @@ app.on('ready', () => {
     function (error, data, respons) {
       mainWindow.loadURL('file://' + __dirname + '/index.html');
     });
+
+
+  // ウインドウの状態によってウインドウを表示する
+  function showOrHideWindow() {
+    if (mainWindow.isFocused()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
+  }
+
+  function addScreenNameToTemplete(templete) {
+    templete.unshift({
+      label: "I'm @" + config.get('screen_name'),
+      click: function () {
+        showOrHideWindow();
+      }
+    })
+  }
+
+  function clearSettings() {
+    config.clear();
+    app.relaunch();
+    app.exit(0);
+  }
 })
 
 app.on('will-quit', () => {
