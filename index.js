@@ -1,10 +1,29 @@
 const {
   electron,
-  ipcRenderer
+  ipcRenderer,
+  remote
 } = require('electron');
 
 var itunes = require('playback');
 var applescript = require('applescript');
+
+// 右クリックメニュー
+const Menu = remote.Menu;
+const MenuItem = remote.MenuItem;
+
+var menu = new Menu();
+menu.append(new MenuItem({ label: '\u{1F498}Tweet', accelerator: 'CmdOrCtrl+Enter', click: function() { tweet(document.forms["tweetform"].elements["tweettext"].value); } }));
+menu.append(new MenuItem({ type: 'separator' }));
+menu.append(new MenuItem({ label: '\u{1F3B5}Now Playing', accelerator: 'CmdOrCtrl+Shift+M', click: function() { getNowplaying() } }));
+menu.append(new MenuItem({ type: 'separator' }));
+menu.append(new MenuItem({ label: 'Cut', accelerator: 'CmdOrCtrl+X', role: 'cut' }));
+menu.append(new MenuItem({ label: 'Copy',accelerator: 'CmdOrCtrl+C', role: 'copy' }));
+menu.append(new MenuItem({ label: 'Paste',accelerator: 'CmdOrCtrl+V', role: 'paste' }));
+
+window.addEventListener('contextmenu', function (e) {
+  e.preventDefault();
+  menu.popup(remote.getCurrentWindow());
+}, false);
 
 // ズームを禁止する
 const webFrame = require('electron').webFrame;
@@ -56,6 +75,7 @@ function tweet(str) {
 
 
 function getNowplaying() {
+  console.log('RendererProcess: getNowplaying');
   itunes.currentTrack(function (track) {
     if (track) {
       // テキストボックスに挿入
