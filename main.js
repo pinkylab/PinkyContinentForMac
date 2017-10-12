@@ -27,7 +27,7 @@ const config = new Config({
 })
 const twitterAPI = require('node-twitter-api');
 
-var data = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+var data = JSON.parse(fs.readFileSync(process.resourcesPath + '/config.json', 'utf8'));
 
 const twitter = new twitterAPI({
   consumerKey: data.consumerKey,
