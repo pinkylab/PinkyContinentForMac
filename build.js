@@ -8,7 +8,7 @@ packager({
   platform: 'darwin', // or win32
   arch: 'x64',        // 64bit
   // electronVersion: '1.7.5',  // electron のバージョン
-  icon: './app.icns', // アイコン
+  icon: './icons/icon.png', // アイコン
   extraResource: './config.json',
 
   appBundleId: 'jp.pinkylab.pinkycontinent', // ドメイン
