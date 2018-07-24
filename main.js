@@ -27,7 +27,7 @@ const config = new Config({
 })
 const twitterAPI = require('node-twitter-api');
 
-var data = JSON.parse(fs.readFileSync(process.resourcesPath + '/config.json', 'utf8'));
+var data = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 const twitter = new twitterAPI({
   consumerKey: data.consumerKey,
@@ -103,7 +103,7 @@ app.on('ready', () => {
   ];
 
   // ログイン済みの場合スクリーンネームを表示する
-  if (config.has('screen_name')) {
+  if (config.has('screen_name1')) {
     addScreenNameToTemplete(taskTrayMenuTemplete);
   }
 
@@ -162,53 +162,17 @@ app.on('ready', () => {
   })
 
   // アクセストークンとかなかったら取得する
-  if (!config.has('twitter_accessToken') || !config.has('twitter_accessTokenSecret')) {
-    twitter.getRequestToken(function (error, requestToken, requestTokenSecret, results) {
-      var url = twitter.getAuthUrl(requestToken);
-      mainWindow.webContents.on('will-navigate', function (event, url) {
-        var matched;
-        if (matched = url.match(/\?oauth_token=([^&]*)&oauth_verifier=([^&]*)/)) {
-          twitter.getAccessToken(requestToken, requestTokenSecret, matched[2], function (error, accessToken, accessTokenSecret, results) {
-            twitter_accessToken = accessToken;
-            twitter_accessTokenSecret = accessTokenSecret;
-            // アクセストークンを保存する
-            config.set('twitter_accessToken', twitter_accessToken);
-            config.set('twitter_accessTokenSecret', twitter_accessTokenSecret);
-            // スクリーンネームも保存しておく
-            config.set('screen_name', results['screen_name']);
-            // タスクトレイのメニューにスクリーンネームを表示
-            if (config.has('screen_name')) {
-              addScreenNameToTemplete(taskTrayMenuTemplete);
-              tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
-            }
-            // 投稿画面へ
-            twitter.verifyCredentials(
-              config.get('twitter_accessToken'),
-              config.get('twitter_accessTokenSecret'), {},
-              function (error, data, respons) {
-                mainWindow.loadURL('file://' + __dirname + '/index.html');
-              });
-            mainWindow.setBounds({
-              x: 0,
-              y: 0,
-              width: 160,
-              height: 100
-            }, true);
-          });
-        }
-        event.preventDefault();
-      });
-      mainWindow.loadURL(url);
-    });
+  if (!config.has('twitter_accessToken1') || !config.has('twitter_accessTokenSecret1')) {
+    twitterLogin(mainWindow);
   }
 
-  twitter_accessToken = config.get('twitter_accessToken');
-  twitter_accessTokenSecret = config.get('twitter_accessTokenSecret');
+  twitter_accessToken = config.get('twitter_accessToken1');
+  twitter_accessTokenSecret = config.get('twitter_accessTokenSecret1');
 
   // 投稿画面へ
   twitter.verifyCredentials(
-    config.get('twitter_accessToken'),
-    config.get('twitter_accessTokenSecret'), {},
+    config.get('twitter_accessToken1'),
+    config.get('twitter_accessTokenSecret1'), {},
     function (error, data, respons) {
       mainWindow.loadURL('file://' + __dirname + '/index.html');
     });
@@ -225,7 +189,7 @@ app.on('ready', () => {
 
   function addScreenNameToTemplete(templete) {
     templete.unshift({
-      label: "I'm @" + config.get('screen_name'),
+      label: "I'm @" + config.get('screen_name1'),
       click: function () {
         showOrHideWindow();
       }
@@ -260,4 +224,44 @@ function tweet(tweetstr, event) {
         event.sender.send('asynchronous-tweet-ret', 'success');
       }
     });
+}
+
+function twitterLogin(mainWindow) {
+  (twitter.getRequestToken(function (error, requestToken, requestTokenSecret, results) {
+    var url = twitter.getAuthUrl(requestToken);
+    mainWindow.webContents.on('will-navigate', function (event, url) {
+      var matched;
+      if (matched = url.match(/\?oauth_token=([^&]*)&oauth_verifier=([^&]*)/)) {
+        twitter.getAccessToken(requestToken, requestTokenSecret, matched[2], function (error, accessToken, accessTokenSecret, results) {
+          twitter_accessToken = accessToken;
+          twitter_accessTokenSecret = accessTokenSecret;
+          // アクセストークンを保存する
+          config.set('twitter_accessToken1', twitter_accessToken);
+          config.set('twitter_accessTokenSecret1', twitter_accessTokenSecret);
+          // スクリーンネームも保存しておく
+          config.set('screen_name1', results['screen_name1']);
+          // タスクトレイのメニューにスクリーンネームを表示
+          if (config.has('screen_name1')) {
+            addScreenNameToTemplete(taskTrayMenuTemplete);
+            tray.setContextMenu(Menu.buildFromTemplate(taskTrayMenuTemplete));
+          }
+          // 投稿画面へ
+          twitter.verifyCredentials(
+            config.get('twitter_accessToken1'),
+            config.get('twitter_accessTokenSecret1'), {},
+            function (error, data, respons) {
+              mainWindow.loadURL('file://' + __dirname + '/index.html');
+            });
+          mainWindow.setBounds({
+            x: 0,
+            y: 0,
+            width: 160,
+            height: 100
+          }, true);
+        });
+      }
+      event.preventDefault();
+    });
+    mainWindow.loadURL(url);
+  }));
 }
